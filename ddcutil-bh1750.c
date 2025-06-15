@@ -25,7 +25,7 @@ int main() {
 
     ddca_enable_debug_trace(0);
     DDCA_Display_Info_List* dlist;
-    ddca_get_display_info_list(&dlist);
+    ddca_get_display_info_list2(&dlist);
     
     if (dlist->ct == 0) {
         fprintf(stderr, "No monitors found via DDC\n");
@@ -33,7 +33,7 @@ int main() {
     }
 
     DDCA_Display_Handle disp;
-    ddca_open_display(dlist->info[0].handle, &disp); // adjust if multiple monitors
+    ddca_open_display2(dlist->info[0].handle, &disp); // adjust if multiple monitors
 
     char buf[32];
     while (1) {
@@ -43,7 +43,7 @@ int main() {
             float lux = atof(buf);
 
             int brightness = map_lux_to_brightness(lux);
-            ddca_set_vcp_feature(disp, 0x10, brightness);
+            ddca_set_any_vcp_value(disp, 0x10, brightness); // set the brightness
         }
         usleep(500000); // 0.5 sec
     }
