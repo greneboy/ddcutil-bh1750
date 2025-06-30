@@ -1,0 +1,9 @@
+[Unit]
+Description=ddcutil-bh1750 daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ddcutil-bh1750
+
+[Install]
+WantedBy=graphical-session.target
