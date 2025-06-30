@@ -49,7 +49,7 @@ This will install it on /usr/bin/
 Lastly if you're using systemd do this.
 ```sh
 # make init
-$ systemctl --user restart --now ddcutil-bh1750.service
+$ systemctl --user enable --now ddcutil-bh1750.service
 ```
 
 ## As of right now
