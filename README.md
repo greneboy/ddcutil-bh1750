@@ -1,10 +1,10 @@
 # ddcutil-bh1750
-A simple ddcutil daemon that automatically adjust your monitor brightness using I²C according to the lux data from the arduino serial.
+A simple ddcutil daemon that automatically adjust your monitor DDC/CI over I²C brightness using ddcutil according to the lux data from the arduino serial.
 
 ## Hardware
-You'll need a light sensor module integrated circuit. Specifically model BH1750. It communicates with the arduino using I²C. 
+You'll need a light sensor module integrated circuit. Specifically model BH1750. It communicates with the arduino also coincidentally using I²C. 
 
-I use Pro Micro ATmega32U4. The light sensor module pin SDA goes to pin 2, and pin SCL to pin 3. If your board is somewhat different, you may need to look up for your board's I²C pin layout.
+I used Pro Micro ATmega32U4. The light sensor module pin SDA goes to pin 2, and pin SCL to pin 3. If your board is somewhat different, you may need to look up for your board's I²C pin layout.
 
 ![ignore that it's not soldered lol](bh1750.jpg)
 
@@ -14,6 +14,7 @@ I use Pro Micro ATmega32U4. The light sensor module pin SDA goes to pin 2, and p
 `ddcutil-devel` or `ddcutil`, and `arduino-cli`.
 
 ### For arduino
+Install the core stuff and necessary header/library for the light module.
 ```sh
 $ arduino-cli core install <your-board>
 $ arduino-cli lib install BH1750
@@ -46,9 +47,14 @@ This will install it on /usr/bin/
 # make install
 ```
 
+Run it. Or...
+```sh
+# ddcutil-bh1750
+```
+
 Lastly if you're using systemd do this.
 ```sh
-# make init
+$ make init
 $ systemctl --user enable --now ddcutil-bh1750.service
 ```
 

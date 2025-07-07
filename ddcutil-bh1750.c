@@ -7,13 +7,10 @@
 #include <unistd.h>
 #include <math.h>
 
-//....
 #include "ddc-0x10.h"
 
-//....
 #define THRESHOLD 8.0 // Set the treshold to trigger ddcutil.
 
-//....
 #ifdef DEBUG
   #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #else
@@ -21,6 +18,8 @@
 #endif
 
 int main() {
+  // TODO Possibly make a config.h
+  // Serial hacking begins
   // ls /dev/serial/by-id, and find your arduino from there
   int serial_port = open("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Leonardo-if00", O_RDWR);
 
@@ -29,7 +28,7 @@ int main() {
 
   // Read in existing settings, and handle any error
   if(tcgetattr(serial_port, &tty) != 0) {
-      DEBUG_PRINT("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+      printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
       return 1;
   }
 
@@ -53,18 +52,17 @@ int main() {
   float last_value = 0.0;
   int first_read = 1;
 
-  // This code is synchronous, I don't bother writing synchronous code, would be useless unless you're handling multiple serial_port's and other headers
+  // This code is synchronous, I don't bother writing asynchronous code, would be useless unless you're handling multiple serial_port's and other headers
   while (1) {
 
     // Perform a "handshake" to the serial out by sending a carriage return (\r)
     unsigned char msg[] = { '\r' };
     write(serial_port, msg, sizeof(msg));
 
-    char read_buf[32];
+    char read_buf[16];
     int total = 0;
     char c;
 
-    // This is what makes it synchronous...
     // Block and wait for the serial_port to return \n
     while (total < sizeof(read_buf) - 1) {
       int num_bytes = read(serial_port, &c, 1);
@@ -76,16 +74,18 @@ int main() {
 
     read_buf[total] = '\0';
 
-    // serial_port returns "0d 0a" (\r\n) at the end of the readable buffer, instead trim "0d 0a" (\r\n). Just in case for clean data lol
+    // serial_port returns "0d 0a" (\r\n) at the end of the readable buffer, instead replace \r with \0 to indicate the end of the buffer
     read_buf[strcspn(read_buf, "\r\n")] = '\0';
 
-    // If the bytes -1 return stderr. Usually happens when serial_port is unplugged during this whole while() loop
+    // Usually happens when serial_port is unplugged during this whole while() loop
     if (total < 0) {
-      DEBUG_PRINT("Error reading: %s", strerror(errno));
+      printf("Error reading: %s", strerror(errno));
       return 1;
     }
 
     float lux = atof(read_buf);
+
+    // Serial hacking ends here
 
     if (first_read || fabs(lux - last_value) >= THRESHOLD) {
 
@@ -106,6 +106,7 @@ int main() {
       DEBUG_PRINT("%d BYTE: MINOR: %.2f -> %.2f\n", total, last_value, lux);
 
     }
+
     sleep(1);
 
   }
